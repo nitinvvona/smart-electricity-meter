@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Energy Meter Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .status {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .metric-label {
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .device-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #ffd700;
+        }
+        
+        .device-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(255, 215, 0, 0.3);
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(255, 215, 0, 0.4);
+        }
+        
+        .timestamp {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Smart Energy Meter Dashboard</h1>
+        
+        <div id="status" class="status">
+            <div class="loading">Loading energy data...</div>
+        </div>
+        
+        <div id="dashboard" style="display: none;">
+            <!-- Total Consumption Card -->
+            <div class="grid">
+                <div class="card">
+                    <h3>📊 Total Consumption</h3>
+                    <div class="metric">
+                        <span class="metric-label">Total Power:</span>
+                        <span class="metric-value" id="totalPower">-- W</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Current:</span>
+                        <span class="metric-value" id="totalCurrent">-- A</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Average Voltage:</span>
+                        <span class="metric-value" id="avgVoltage">-- V</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Energy:</span>
+                        <span class="metric-value" id="totalEnergy">-- kWh</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚡ Power Status</h3>
+                    <div class="metric">
+                        <span class="metric-label">System Status:</span>
+                        <span class="metric-value" id="systemStatus">Normal</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Cost Estimate:</span>
+                        <span class="metric-value" id="costEstimate">₹ --</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Efficiency:</span>
+                        <span class="metric-value" id="efficiency">Good</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Peak Load:</span>
+                        <span class="metric-value" id="peakLoad">-- W</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Individual Devices -->
+            <div class="card">
+                <h3>🏘️ Individual Device Consumption</h3>
+                <div class="device-grid" id="deviceGrid">
+                    <!-- Device cards will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadData()">🔄 Refresh Data</button>
+        
+        <div class="timestamp" id="lastUpdate">
+            Last updated: --
+        </div>
+    </div>
+
+    <script>
+        // ThingSpeak configuration - UPDATE THESE WITH YOUR VALUES
+        const CHANNEL_ID = '3093022';  // Replace with your actual channel ID
+        const READ_API_KEY = 'DQ9UEZPYZ9NDGHRK';  // You'll need to get this from ThingSpeak
+        
+        // Device names
+        const devices = [
+            { name: 'AC Unit', icon: '❄️' },
+            { name: 'Fan', icon: '🌀' },
+            { name: 'Heater', icon: '🔥' },
+            { name: 'Lighting', icon: '💡' },
+            { name: 'Refrigerator', icon: '🧊' }
+        ];
+        
+        // Electricity rate (₹ per kWh)
+        const ELECTRICITY_RATE = 6.0;
+        
+        async function loadData() {
+            document.getElementById('status').innerHTML = '<div class="loading">🔄 Fetching latest energy data...</div>';
+            
+            try {
+                // Fetch latest data from ThingSpeak
+                const response = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds/last.json`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data from ThingSpeak');
+                }
+                
+                const data = await response.json();
+                
+                // Update total consumption
+                document.getElementById('totalPower').textContent = `${parseFloat(data.field1 || 0).toFixed(1)} W`;
+                document.getElementById('totalCurrent').textContent = `${parseFloat(data.field2 || 0).toFixed(2)} A`;
+                document.getElementById('avgVoltage').textContent = `${parseFloat(data.field3 || 0).toFixed(1)} V`;
+                document.getElementById('totalEnergy').textContent = `${parseFloat(data.field4 || 0).toFixed(4)} kWh`;
+                
+                // Calculate cost estimate
+                const energyKwh = parseFloat(data.field4 || 0);
+                const costEstimate = energyKwh * ELECTRICITY_RATE;
+                document.getElementById('costEstimate').textContent = `₹ ${costEstimate.toFixed(2)}`;
+                
+                // Update system status
+                const totalPower = parseFloat(data.field1 || 0);
+                let status = 'Normal';
+                let statusColor = '#90EE90';
+                
+                if (totalPower > 3000) {
+                    status = 'High Usage';
+                    statusColor = '#FFB347';
+                } else if (totalPower > 5000) {
+                    status = 'Critical';
+                    statusColor = '#FF6B6B';
+                }
+                
+                const statusElement = document.getElementById('systemStatus');
+                statusElement.textContent = status;
+                statusElement.style.color = statusColor;
+                
+                // Update peak load (simplified - using current total power)
+                document.getElementById('peakLoad').textContent = `${totalPower.toFixed(0)} W`;
+                
+                // Update efficiency status
+                const efficiency = totalPower < 2000 ? 'Excellent' : totalPower < 3000 ? 'Good' : 'Poor';
+                document.getElementById('efficiency').textContent = efficiency;
+                
+                // Update individual devices
+                updateDeviceCards(data);
+                
+                // Update timestamp
+                const updateTime = new Date(data.created_at).toLocaleString();
+                document.getElementById('lastUpdate').textContent = `Last updated: ${updateTime}`;
+                
+                // Hide status, show dashboard
+                document.getElementById('status').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('status').innerHTML = 
+                    `<div class="error">❌ Error loading data: ${error.message}<br>
+                     <small>Make sure to update the channel ID and get a Read API Key from ThingSpeak</small></div>`;
+            }
+        }
+        
+        function updateDeviceCards(data) {
+            const deviceGrid = document.getElementById('deviceGrid');
+            deviceGrid.innerHTML = '';
+            
+            // Device power values from fields 5-8
+            const devicePowers = [
+                parseFloat(data.field5 || 0),  // AC Unit
+                parseFloat(data.field6 || 0),  // Fan
+                parseFloat(data.field7 || 0),  // Heater
+                parseFloat(data.field8 || 0) / 2, // Lighting (field8 is light+fridge combined, so divide by 2)
+                parseFloat(data.field8 || 0) / 2  // Refrigerator
+            ];
+            
+            devices.forEach((device, index) => {
+                const power = devicePowers[index];
+                const percentage = ((power / parseFloat(data.field1 || 1)) * 100).toFixed(1);
+                
+                const deviceCard = document.createElement('div');
+                deviceCard.className = 'device-card';
+                deviceCard.innerHTML = `
+                    <div class="device-name">${device.icon} ${device.name}</div>
+                    <div class="metric">
+                        <span class="metric-label">Power:</span>
+                        <span class="metric-value">${power.toFixed(1)} W</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">% of Total:</span>
+                        <span class="metric-value">${percentage}%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Status:</span>
+                        <span class="metric-value">${power > 10 ? '🟢 Active' : '🔴 Standby'}</span>
+                    </div>
+                `;
+                deviceGrid.appendChild(deviceCard);
+            });
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadData, 2000);
+        
+        // Load data when page loads
+        window.onload = loadData;
+    </script>
+</body>
+</html>
