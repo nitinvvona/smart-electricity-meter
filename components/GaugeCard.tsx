@@ -34,9 +34,9 @@ const Gauge = ({ value, min, max, label, totalEnergy }: ExtendedGaugeProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="relative w-full h-64 flex flex-col items-center justify-center">
+      <div className="relative w-full h-40 flex flex-col items-center justify-end">
         {/* Gauge background */}
-        <div className="absolute w-48 h-24 bg-slate-100 dark:bg-slate-800 rounded-t-full overflow-hidden">
+        <div className="absolute bottom-0 w-64 h-32 bg-slate-100 dark:bg-slate-800 rounded-t-full overflow-hidden">
           <div className="absolute bottom-0 left-0 w-1/3 h-full bg-green-500 opacity-20" />
           <div className="absolute bottom-0 left-1/3 w-1/3 h-full bg-yellow-500 opacity-20" />
           <div className="absolute bottom-0 left-2/3 w-1/3 h-full bg-red-500 opacity-20" />
@@ -44,32 +44,23 @@ const Gauge = ({ value, min, max, label, totalEnergy }: ExtendedGaugeProps) => {
 
         {/* Gauge needle */}
         <div
-          className="absolute bottom-0 w-1 h-24 bg-gray-800 dark:bg-gray-200 origin-bottom transform transition-transform duration-700 ease-out"
+          className="absolute bottom-0 w-1 h-28 bg-gray-800 dark:bg-gray-200 origin-bottom transform transition-transform duration-700 ease-out"
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           <div className="w-3 h-3 rounded-full bg-gray-800 dark:bg-gray-200 -ml-1 -mt-1"></div>
         </div>
 
         {/* Gauge center point */}
-        <div className="absolute bottom-0 w-4 h-4 bg-gray-800 dark:bg-gray-200 rounded-full transform -translate-x-1/2 -translate-y-0"></div>
+        <div className="absolute bottom-0 w-4 h-4 bg-gray-800 dark:bg-gray-200 rounded-full transform -translate-x-1/2"></div>
 
-        {/* ✅ Removed the bold numeric value (Watt reading) */}
-
-        {/* Optional label (kept, will only render if provided) */}
-        {label && (
-          <div className="absolute bottom-0 transform translate-y-8 text-center">
-            <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
-          </div>
-        )}
-
-        {/* Min/Max labels */}
-        <div className="absolute bottom-0 w-48 flex justify-between transform translate-y-2">
+        {/* Min/Max labels - positioned at the ends */}
+        <div className="absolute bottom-0 w-64 flex justify-between transform translate-y-2">
           <span className="text-xs">{min}</span>
           <span className="text-xs">{max}</span>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 mt-4">
         <div className="flex justify-between items-center p-2 bg-slate-100 dark:bg-slate-800 rounded-md">
           <span className="font-medium">Total Energy:</span>
           <span className="font-semibold text-amber-500">
