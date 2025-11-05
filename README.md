@@ -57,6 +57,8 @@ Access the Dashboard
 
 Open your browser and navigate to http://localhost:3000 to view the dashboard.
 
+ThingSpeak Integration: https://wokwi.com/projects/443294490355404801
+
 Running the Backend (Optional)
 If you want to simulate or connect to a real electricity meter, set up the Python backend:
 
